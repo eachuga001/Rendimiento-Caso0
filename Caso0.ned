@@ -38,19 +38,22 @@ simple Receptor
     gates:
         input in;
 }
+
 network Caso0
 {
     @display("bgb=557,310");
     types:
         channel Channel extends ned.DatarateChannel
         {
-            datarate = 100kbps;
+            datarate = 100Mbps;
+            delay = 1ms;
         }
     submodules:
 
         Source[3]: Fuente;
         nodo[5]: Node;
         Receptor[2]: Receptor;
+        
     connections:
 
 //        Source.out --> DatarateChannel --> nodo.in++;
@@ -69,6 +72,7 @@ network Caso0
         nodo[2].out++ --> Channel --> Receptor[0].in;
         //nodo4
         nodo[3].out++ --> Channel --> Receptor[1].in;
+        
         //nodo5
         Source[2].out --> Channel --> nodo[4].in++;
         nodo[4].out++ --> Channel --> nodo[3].in++;

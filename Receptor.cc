@@ -7,6 +7,7 @@ using namespace omnetpp;
 class Receptor : public cSimpleModule{
     public:
         virtual ~Receptor();
+
     protected:
         virtual void handleMessage(cMessage *msg) override;
 };
@@ -18,5 +19,5 @@ Receptor::~Receptor(){
 }
 
 void Receptor::handleMessage(cMessage *msg){
-    EV << "Mensaje recibido " << msg << " on port number " << getIndex() << "]\n";
+    EV << "Mensaje recibido "<< msg <<" rx-" << getIndex();// << msg << " on port number " << getIndex() << "]\n";
 }

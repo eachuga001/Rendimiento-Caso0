@@ -33,7 +33,7 @@ void Fuente::initialize(){
             //txChannel = gate("out")-> getTransmissionChannel();
         packet = new paquete();
             numSeq=0;
-            start_time = 1;
+            start_time = 0;
             scheduleAt(start_time,packet);
             //char msgname[20];
             //sprintf(msgname, "Mensaje-%d Src-%d", numSeq++,getIndex());
@@ -44,15 +44,14 @@ void Fuente::initialize(){
 }
 void Fuente::handleMessage(cMessage * msg){
 
-       // ASSERT(msg->isSelfMessage());
-        //delete msg;
         char msgname[20];
         sprintf(msgname, "Mensaje-%d", numSeq++);
         paquete *newPacket = new paquete(msgname,0);
         newPacket->setBitLength(1024);
-        EV<< "Source-"<<getIndex() << " Enviando";
+        EV<< "Source-"<<getIndex() << " Enviando" << newPacket;
         send(newPacket,"out");
-        scheduleAt(simTime()+exponential(1),packet);
+        scheduleAt(simTime()+exponential(0.5),packet);
+
         //cMessage *msg2 = new cMessage(msgname);
 
         //send(msg2,"out");
