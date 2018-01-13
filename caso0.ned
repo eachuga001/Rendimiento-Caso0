@@ -26,9 +26,12 @@ simple Node
 {
     parameters:
         @display("i=block/routing");
+        int n_entradas @prompt("Numero de entradas") = default(1);
+        int n_salidas  @prompt("Numero de salidas") = default(1);
+        string probabilities @prompt("Probabilidades de escoger puerto de salida") = default("1");
     gates:
-        input in[];
-        output out[];
+        input in[n_entradas];
+        output out[n_salidas];
 }
 
 simple Receptor
@@ -62,16 +65,16 @@ network Caso0
 
         //nodo1
         Source[0].out --> Channel --> nodo[0].in++;
-        nodo[0].out++ --> Channel --> nodo[1].in++;
-        nodo[0].out++ --> Channel --> nodo[4].in++;
+        nodo[0].out[0] --> Channel --> nodo[1].in[0];
+        nodo[0].out[1] --> Channel --> nodo[4].in[0];
         //nodo2		
-        Source[1].out --> Channel --> nodo[1].in++;
-        nodo[1].out++ --> Channel --> nodo[2].in++;
-        nodo[1].out++ --> Channel --> nodo[3].in++;
+        Source[1].out --> Channel --> nodo[1].in[1];
+        nodo[1].out[0] --> Channel --> nodo[2].in[0];
+        nodo[1].out[1] --> Channel --> nodo[3].in[0];
         //nodo3
-        nodo[2].out++ --> Channel --> Receptor[0].in;
+        nodo[2].out[0] --> Channel --> Receptor[0].in;
         //nodo4
-        nodo[3].out++ --> Channel --> Receptor[1].in;
+        nodo[3].out[0] --> Channel --> Receptor[1].in;
         
         //nodo5
         Source[2].out --> Channel --> nodo[4].in++;
