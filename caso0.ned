@@ -18,6 +18,9 @@ simple Fuente
 {
     parameters:
         @display("i=block/source");
+        double interArrivalsTime = default(1.0);
+    	int packet_length = default(100);
+    	int n_paquetes = default(100);
     gates:
         output out;
 }
