@@ -2,6 +2,8 @@
 #include <string.h>
 #include <omnetpp.h>
 
+#include "sendMessage_m.h"
+
 using namespace omnetpp;
 
 class Node : public cSimpleModule
@@ -11,16 +13,19 @@ class Node : public cSimpleModule
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual int getOutPort();
+    virtual void sendPacket(cMessage* packet,int port);
   private:
     std::vector<double> probabilities;
+    cQueue* txQueues;
+    sendMessage* sendEvents;
+    enum state {idle=0,active=1};
+    state* estado;
 };
 
 Define_Module(Node);
 
 void Node::initialize()
 {
-    std::vector<int> distances; // holds result
-
     //Leer las probabilidades de salida por cada puerta de salida.
     const char* probs = par("probabilities");
     EV << "probabilidades: " << probs << endl;
@@ -45,6 +50,17 @@ void Node::initialize()
         }
         probabilities.push_back(probabilidad);
     }
+
+    int n_salidas = (int) par("n_salidas");
+    txQueues = new cQueue [n_salidas];
+    sendEvents = new sendMessage[n_salidas];
+    estado = new state[n_salidas];
+    for (int i=0; i < n_salidas;i++)
+    {
+        sendEvents[i].setPort(i);
+        estado[i] = idle;
+    }
+
 }
 
 void Node::handleMessage(cMessage *msg)
@@ -54,20 +70,42 @@ void Node::handleMessage(cMessage *msg)
     EV << "Message " << msg << " arrived.\n";
     //delete msg;
     // We need to forward the message.
-    forwardMessage(msg);
+    if (msg -> isSelfMessage())
+    {
+        sendMessage* sendEvent = check_and_cast <sendMessage *>(msg);
+        int port = sendEvent->getPort();
+        if (txQueues[port].isEmpty() == false)
+        {
+            cMessage *message = check_and_cast<cMessage *>(txQueues[port].pop());
+            sendPacket(message, port);
+        }
+
+        else
+        {
+            estado[port] = idle;
+        }
+    }
+
+    else
+    {
+        forwardMessage(msg);
+    }
 
 }
 
 void Node::forwardMessage(cMessage *msg)
 {
-    // In this example, we just pick a random gate to send it on.
-    // We draw a random number between 0 and the size of gate `out[]'.
-    //int n = gateSize("out");
-    //int k = intuniform(0, n-1);
-
-    //int port = getRoute(0.25);
     int port = getOutPort();
-    send(msg,"out",port);
+    if (estado[port] == idle)
+    {
+        estado[port]=active;
+        sendPacket(msg,port);
+    }
+
+    else
+    {
+        txQueues[port].insert(msg);
+    }
     //EV<< "Nodo-"<<getIndex() << " Enviando por el puerto-"<<port;
     //EV << "Forwarding message " << port << " on port out[" << port << "]\n";
 //    send(msg, "out",port);
@@ -82,4 +120,11 @@ int Node::getOutPort(){
         rand = rand - probabilities[port];
     }
     return port;
+}
+
+void Node::sendPacket(cMessage* packet,int port)
+{
+    send(packet -> dup(), "out",port);
+    cChannel* txChannel = gate("out",port)->getTransmissionChannel();
+    scheduleAt(txChannel->getTransmissionFinishTime(), &sendEvents[port]);
 }
