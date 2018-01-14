@@ -125,6 +125,6 @@ int Node::getOutPort(){
 void Node::sendPacket(cMessage* packet,int port)
 {
     send(packet -> dup(), "out",port);
-    cChannel* txChannel = gate("out",port)->getTransmissionChannel();
+    cChannel* txChannel = gate("out",port)->getChannel();
     scheduleAt(txChannel->getTransmissionFinishTime(), &sendEvents[port]);
 }
