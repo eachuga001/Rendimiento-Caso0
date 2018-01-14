@@ -48,10 +48,11 @@ void Fuente::handleMessage(cMessage * msg){
 
 paquete * Fuente::generaPaquete(){
     char nombrePaquete[15];
-    sprintf(nombrePaquete,"msg-%d",seq++);
+    sprintf(nombrePaquete,"msg-%d",seq);
     paquete *msg = new paquete(nombrePaquete,0);
     msg -> setSeq(seq);
     msg -> setBitLength((int)par("packet_length"));
     msg -> setTimestamp(simTime());
+    seq++;
     return msg;
 }
