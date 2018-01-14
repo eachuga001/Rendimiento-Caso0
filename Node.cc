@@ -29,7 +29,6 @@ void Node::initialize()
     {
         double probabilidad;
         std::string token = tokenizer.nextToken();
-        EV << token << endl;
         int delimitador = token.find("/");
         if (delimitador != -1)
         {
@@ -76,7 +75,7 @@ void Node::forwardMessage(cMessage *msg)
 
 int Node::getOutPort(){
     int port = 0;
-    int rand = uniform (0,1);
+    double rand = uniform (0,1);
     while (rand > probabilities[port])
     {
         port++;
