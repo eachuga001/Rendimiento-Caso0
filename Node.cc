@@ -12,7 +12,7 @@ class Node : public cSimpleModule
     virtual void handleMessage(cMessage *msg) override;
     virtual int getOutPort();
   private:
-    std::vector<int> probabilities;
+    std::vector<double> probabilities;
 };
 
 Define_Module(Node);
@@ -22,10 +22,30 @@ void Node::initialize()
     std::vector<int> distances; // holds result
 
     //Leer las probabilidades de salida por cada puerta de salida.
-    const char *probs = par("probabilities");
-    cStringTokenizer tokenizer(probs);
+    const char* probs = par("probabilities");
+    EV << "probabilidades: " << probs << endl;
+    cStringTokenizer tokenizer(probs," ");
     while (tokenizer.hasMoreTokens())
-        probabilities.push_back(atoi(tokenizer.nextToken()));
+    {
+        double probabilidad;
+        std::string token = tokenizer.nextToken();
+        EV << token << endl;
+        int delimitador = token.find("/");
+        if (delimitador != -1)
+        {
+            std::string numeradorString = token.substr(0,delimitador);
+            double numerador = strtod(numeradorString.c_str(),NULL);
+            std::string denominadorString = token.substr(delimitador+1,token.npos);
+            double denominador = strtod(denominadorString.c_str(),NULL);
+            probabilidad = numerador/denominador;
+        }
+
+        else
+        {
+            probabilidad = strtod(token.c_str(),NULL);
+        }
+        probabilities.push_back(probabilidad);
+    }
 }
 
 void Node::handleMessage(cMessage *msg)
