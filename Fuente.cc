@@ -52,5 +52,6 @@ paquete * Fuente::generaPaquete(){
     paquete *msg = new paquete(nombrePaquete,0);
     msg -> setSeq(seq);
     msg -> setBitLength((int)par("packet_length"));
+    msg -> setTimestamp(simTime());
     return msg;
 }
