@@ -126,5 +126,6 @@ void Node::sendPacket(cMessage* packet,int port)
 {
     send(packet -> dup(), "out",port);
     cChannel* txChannel = gate("out",port)->getChannel();
-    scheduleAt(txChannel->getTransmissionFinishTime(), &sendEvents[port]);
+    simtime_t time = std::max(txChannel->getTransmissionFinishTime(), simTime());
+    scheduleAt(time, &sendEvents[port]);
 }
