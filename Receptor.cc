@@ -10,6 +10,10 @@ class Receptor : public cSimpleModule{
 
     protected:
         virtual void handleMessage(cMessage *msg) override;
+        virtual void finish() override;
+    private:
+        int receivedPackets = 0;
+        simtime_t delayTotal = 0;
 };
 
 Define_Module(Receptor);
@@ -19,5 +23,18 @@ Receptor::~Receptor(){
 }
 
 void Receptor::handleMessage(cMessage *msg){
-    EV << "Mensaje recibido "<< msg <<" rx-" << getIndex();// << msg << " on port number " << getIndex() << "]\n";
+    EV << "Mensaje recibido "<< msg <<" rx-" << getIndex() << endl;// << msg << " on port number " << getIndex() << "]\n";
+    simtime_t delay = simTime() - msg->getTimestamp();
+    EV << "El delay del paquete es: " << delay << endl;
+
+    delayTotal += delay;
+    receivedPackets++;
+}
+
+void Receptor::finish()
+{
+    double delayTotalDouble = delayTotal.dbl();
+    double delayMedio = delayTotalDouble / receivedPackets;
+    EV << "Delay medio: " << delayMedio << endl;
+    EV << "Numero de paquetes recibidos: " << receivedPackets << endl;
 }
