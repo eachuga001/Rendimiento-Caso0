@@ -52,7 +52,7 @@ network Caso0
         channel Channel extends ned.DatarateChannel
         {
             datarate = 100Mbps;
-            delay = 1ms;
+            delay = 0ms;
         }
     submodules:
 
@@ -67,20 +67,20 @@ network Caso0
 //        nodo.out++ --> DatarateChannel --> Receptor[1].in;
 
         //nodo1
-        Source[0].out --> Channel --> nodo[0].in++;
+        Source[0].out --> nodo[0].in++;
         nodo[0].out[0] --> Channel --> nodo[1].in[0];
         nodo[0].out[1] --> Channel --> nodo[4].in[0];
         //nodo2		
-        Source[1].out --> Channel --> nodo[1].in[1];
+        Source[1].out --> nodo[1].in[1];
         nodo[1].out[0] --> Channel --> nodo[2].in[0];
         nodo[1].out[1] --> Channel --> nodo[3].in[0];
         //nodo3
-        nodo[2].out[0] --> Channel --> Receptor[0].in;
+        nodo[2].out[0] --> Receptor[0].in;
         //nodo4
-        nodo[3].out[0] --> Channel --> Receptor[1].in;
+        nodo[3].out[0] --> Receptor[1].in;
         
         //nodo5
-        Source[2].out --> Channel --> nodo[4].in++;
+        Source[2].out --> nodo[4].in++;
         nodo[4].out++ --> Channel --> nodo[3].in++;
         nodo[4].out++ --> Channel --> nodo[1].in++;
 
