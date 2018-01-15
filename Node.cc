@@ -15,12 +15,16 @@ class Node : public cSimpleModule
     virtual void handleMessage(cMessage *msg) override;
     virtual int getOutPort();
     virtual void sendPacket(cMessage* packet,int port);
+    virtual void finish() override;
   private:
     std::vector<double> probabilities;
     cQueue* txQueues;
     sendMessage* sendEvents;
     enum state {idle=0,active=1};
     state* estado;
+    double* realProbabilities;
+    int receivedPackets = 0;
+    int n_salidas;
 };
 
 Define_Module(Node);
@@ -52,7 +56,16 @@ void Node::initialize()
         probabilities.push_back(probabilidad);
     }
 
-    int n_salidas = (int) par("n_salidas");
+    EV << "Las probabilidades del nodo son: ";
+    for (int i = 0; i<probabilities.size();i++)
+    {
+        EV << i << " ";
+    }
+    EV << endl;
+
+    n_salidas = (int) par("n_salidas");
+    realProbabilities = new double [n_salidas];
+    std::fill_n(realProbabilities, n_salidas, 0);
     txQueues = new cQueue [n_salidas];
     sendEvents = new sendMessage[n_salidas];
     estado = new state[n_salidas];
@@ -90,6 +103,7 @@ void Node::handleMessage(cMessage *msg)
 
     else
     {
+        receivedPackets += 1;
         forwardMessage(msg);
     }
 
@@ -98,6 +112,7 @@ void Node::handleMessage(cMessage *msg)
 void Node::forwardMessage(cMessage *msg)
 {
     int port = getOutPort();
+    realProbabilities[port] += 1;
     if (estado[port] == idle)
     {
         estado[port]=active;
@@ -139,4 +154,15 @@ void Node::sendPacket(cMessage* packet,int port)
     cChannel* txChannel = gate("out",port)->getChannel();
     simtime_t time = std::max(txChannel->getTransmissionFinishTime(), simTime());
     scheduleAt(time, &sendEvents[port]);
+}
+
+void Node::finish()
+{
+    EV << "Las probabilidades reales del nodo son: ";
+    for (int i = 0; i<n_salidas;i++)
+    {
+        double probability = realProbabilities[i]/receivedPackets;
+        EV << probability << " ";
+    }
+    EV << endl;
 }

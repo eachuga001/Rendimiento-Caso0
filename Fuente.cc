@@ -14,6 +14,8 @@ class Fuente: public cSimpleModule
         int seq;
         int numPaquetesEnviados;
         int totalPaquetes;
+        double totalBitLength = 0;
+        simtime_t totalInterArrivalsTime = 0;
 
     public:
         virtual ~Fuente();
@@ -22,6 +24,7 @@ class Fuente: public cSimpleModule
         virtual void handleMessage(cMessage *msg) override;
         virtual void initialize() override;
         virtual paquete * generaPaquete();
+        virtual void finish() override;
 };
 
 Define_Module(Fuente);
@@ -43,6 +46,7 @@ void Fuente::handleMessage(cMessage * msg){
     if (numPaquetesEnviados < totalPaquetes)
     {
         simtime_t interArrivalsTime= exponential((simtime_t)par("interArrivalsTime"));
+        totalInterArrivalsTime += interArrivalsTime;
         scheduleAt(simTime()+ interArrivalsTime,sendEvent);
     }
 }
@@ -52,10 +56,17 @@ paquete * Fuente::generaPaquete(){
     sprintf(nombrePaquete,"msg-%d",seq);
     paquete *msg = new paquete(nombrePaquete,0);
     msg -> setSeq(seq);
-    unsigned int bitLength = exponential((unsigned int)par("packet_length"));
+    double bitLength = exponential((double)par("packet_length"));
+    totalBitLength += bitLength;
     msg -> setBitLength(bitLength);
     msg -> setTimestamp(simTime());
     msg ->setNodesVisited("");
     seq++;
     return msg;
+}
+
+void Fuente::finish()
+{
+    EV << "El interArrivalsTime medio es: " << totalInterArrivalsTime/numPaquetesEnviados << endl;
+    EV << "La longitud media de paquetes es: " << totalBitLength/numPaquetesEnviados << endl;
 }

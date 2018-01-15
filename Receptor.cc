@@ -53,6 +53,7 @@ void Receptor::handleMessage(cMessage *msg){
     }
     delayTotal += delay;
     receivedPackets++;
+    delete(msg);
 }
 
 void Receptor::finish()
