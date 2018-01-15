@@ -42,7 +42,8 @@ void Fuente::handleMessage(cMessage * msg){
     numPaquetesEnviados++;
     if (numPaquetesEnviados < totalPaquetes)
     {
-        scheduleAt(simTime()+(simtime_t) par("interArrivalsTime"),sendEvent);
+        simtime_t interArrivalsTime= exponential((simtime_t)par("interArrivalsTime"));
+        scheduleAt(simTime()+ interArrivalsTime,sendEvent);
     }
 }
 
@@ -51,8 +52,10 @@ paquete * Fuente::generaPaquete(){
     sprintf(nombrePaquete,"msg-%d",seq);
     paquete *msg = new paquete(nombrePaquete,0);
     msg -> setSeq(seq);
-    msg -> setBitLength((int)par("packet_length"));
+    unsigned int bitLength = exponential((unsigned int)par("packet_length"));
+    msg -> setBitLength(bitLength);
     msg -> setTimestamp(simTime());
+    msg ->setNodesVisited("");
     seq++;
     return msg;
 }

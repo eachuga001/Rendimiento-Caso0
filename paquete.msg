@@ -15,4 +15,5 @@
 packet paquete
 {
     unsigned int seq;
+    string nodesVisited;
 }

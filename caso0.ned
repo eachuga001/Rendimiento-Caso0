@@ -32,6 +32,7 @@ simple Node
         int n_entradas @prompt("Numero de entradas") = default(1);
         int n_salidas  @prompt("Numero de salidas") = default(1);
         string probabilities @prompt("Probabilidades de escoger puerto de salida") = default("1");
+        string nodeName = default("undefined");
     gates:
         input in[n_entradas];
         output out[n_salidas];
@@ -51,7 +52,7 @@ network Caso0
     types:
         channel Channel extends ned.DatarateChannel
         {
-            datarate = 100Mbps;
+            datarate = 3 Mbps;
             delay = 0ms;
         }
         channel Canal extends ned.IdealChannel

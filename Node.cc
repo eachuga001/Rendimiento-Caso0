@@ -3,6 +3,7 @@
 #include <omnetpp.h>
 
 #include "sendMessage_m.h"
+#include "paquete_m.h"
 
 using namespace omnetpp;
 
@@ -77,6 +78,7 @@ void Node::handleMessage(cMessage *msg)
         if (txQueues[port].isEmpty() == false)
         {
             cMessage *message = check_and_cast<cMessage *>(txQueues[port].pop());
+
             sendPacket(message, port);
         }
 
@@ -124,6 +126,15 @@ int Node::getOutPort(){
 
 void Node::sendPacket(cMessage* packet,int port)
 {
+    paquete* pack = check_and_cast<paquete*>(packet);
+    std::string nodesVisited = pack->getNodesVisited();
+    if (nodesVisited.compare("")!=0)
+    {
+        nodesVisited.append("-");
+    }
+    const char* nodeName = (const char*) par("nodeName");
+    nodesVisited.append(nodeName);
+    pack->setNodesVisited(nodesVisited.c_str());
     send(packet -> dup(), "out",port);
     cChannel* txChannel = gate("out",port)->getChannel();
     simtime_t time = std::max(txChannel->getTransmissionFinishTime(), simTime());
