@@ -154,6 +154,7 @@ void Node::sendPacket(cMessage* packet,int port)
     cChannel* txChannel = gate("out",port)->getChannel();
     simtime_t time = std::max(txChannel->getTransmissionFinishTime(), simTime());
     scheduleAt(time, &sendEvents[port]);
+    delete (packet);
 }
 
 void Node::finish()

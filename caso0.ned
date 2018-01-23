@@ -44,6 +44,16 @@ simple Receptor
 
     gates:
         input in;
+        output out;
+}
+
+simple AcumuladorDatos
+{
+    parameters:
+        int nEntradasAcumulador;
+        
+    gates:
+        input in[nEntradasAcumulador];
 }
 
 network Caso0
@@ -63,6 +73,7 @@ network Caso0
         Source[3]: Fuente;
         nodo[5]: Node;
         Receptor[2]: Receptor;
+        acumulador: AcumuladorDatos;
         
     connections:
 
@@ -87,6 +98,8 @@ network Caso0
         Source[2].out --> Canal --> nodo[4].in++;
         nodo[4].out++ --> Channel --> nodo[3].in++;
         nodo[4].out++ --> Channel --> nodo[1].in++;
-
-
+        
+        Receptor[0].out --> Canal --> acumulador.in[0];
+        Receptor[1].out --> Canal --> acumulador.in[1];
+        
 }

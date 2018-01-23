@@ -16,12 +16,6 @@ class Receptor : public cSimpleModule{
     private:
         int receivedPackets = 0;
         simtime_t delayTotal = 0;
-        struct rutaPaquetes
-        {
-            simtime_t delay;
-            int numPaquetes;
-        };
-        std::map<std::string,rutaPaquetes> mapa;
 };
 
 Define_Module(Receptor);
@@ -37,23 +31,9 @@ void Receptor::handleMessage(cMessage *msg){
     EV << "El delay del paquete es: " << delay << endl;
     std::string ruta = pack->getNodesVisited();
     EV << "Ruta seguida por el paquete: " << ruta;
-
-    std::map<std::string,struct rutaPaquetes>::iterator it;
-    it = mapa.find(ruta);
-    if (it != mapa.end())
-    {
-        it->second.delay += delay;
-        it->second.numPaquetes += 1;
-    }
-
-    else
-    {
-       struct rutaPaquetes rp = {delay,1};
-       mapa[ruta]=rp;
-    }
     delayTotal += delay;
     receivedPackets++;
-    delete(msg);
+    send(msg,"out");
 }
 
 void Receptor::finish()
@@ -62,10 +42,4 @@ void Receptor::finish()
     double delayMedio = delayTotalDouble / receivedPackets;
     EV << "Delay medio: " << delayMedio << endl;
     EV << "Numero de paquetes recibidos: " << receivedPackets << endl;
-
-    for (std::map<std::string,struct rutaPaquetes>::iterator it = mapa.begin();it!=mapa.end();++it)
-    {
-        simtime_t delayMedioRuta = it->second.delay / it->second.numPaquetes;
-        EV << "El delay medio de la ruta " << it->first << " es " << delayMedioRuta << endl;
-    }
 }
