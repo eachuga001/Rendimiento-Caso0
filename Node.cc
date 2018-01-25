@@ -131,7 +131,7 @@ void Node::forwardMessage(cMessage *msg)
 int Node::getOutPort(){
     int port = 0;
     double rand = uniform (0,1);
-    while (rand > probabilities[port])
+    while (rand >= probabilities[port])
     {
         port++;
         rand = rand - probabilities[port];
