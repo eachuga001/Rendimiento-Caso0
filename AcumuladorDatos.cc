@@ -13,6 +13,7 @@ class AcumuladorDatos : public cSimpleModule{
     protected:
         virtual void handleMessage(cMessage *msg) override;
         virtual void finish() override;
+        virtual void initialize() override;
     private:
         int receivedPackets = 0;
         simtime_t delayTotal = 0;
@@ -31,6 +32,11 @@ Define_Module(AcumuladorDatos);
 
 AcumuladorDatos::~AcumuladorDatos(){
     //cancelAndDelete(primerPaq);
+}
+
+void AcumuladorDatos::initialize()
+{
+    delayVector.setName("Delay");
 }
 
 void AcumuladorDatos::handleMessage(cMessage *msg){
@@ -53,6 +59,7 @@ void AcumuladorDatos::handleMessage(cMessage *msg){
     }
     delayTotal += delay;
     receivedPackets++;
+    delayVector.record(delay);
     delete(msg);
 }
 
