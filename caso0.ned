@@ -38,6 +38,22 @@ simple Node
         output out[n_salidas];
 }
 
+simple NodeSW
+{
+    parameters:
+        @display("i=block/routing");
+        int n_entradas @prompt("Numero de entradas") = default(1);
+        int n_salidas  @prompt("Numero de salidas") = default(1);
+        string probabilities @prompt("Probabilidades de escoger puerto de salida") = default("1");
+        string nodeName = default("undefined");
+        double timeout = default(1);
+        double p_paquete = default(0);
+    gates:
+        input inPaquetes @loose;
+        inout in[n_entradas] @loose;
+        inout out[n_salidas] @loose;
+}
+
 simple Receptor
 {
     parameters:
@@ -102,4 +118,46 @@ network Caso0
         Receptor[0].out --> Canal --> acumulador.in[0];
         Receptor[1].out --> Canal --> acumulador.in[1];
         
+}
+
+network Caso0SW
+{
+    @display("bgb=557,310");
+    types:
+        channel Channel extends ned.DatarateChannel
+        {
+            datarate = 3 Mbps;
+            delay = 0ms;
+        }
+        channel Canal extends ned.IdealChannel
+        {
+        }
+    submodules:
+
+        Source[3]: Fuente;
+        nodo[5]: NodeSW;
+        Receptor[2]: Receptor;
+        acumulador: AcumuladorDatos;
+        
+    connections:
+        //nodo1
+        Source[0].out --> Canal --> nodo[0].inPaquetes;
+        nodo[0].out[0] <--> Channel <--> nodo[1].in[0];
+        nodo[0].out[1] <--> Channel <--> nodo[4].in[0];
+        //nodo2		
+        Source[1].out --> Canal --> nodo[1].inPaquetes;
+        nodo[1].out[0] <--> Channel <--> nodo[2].in[0];
+        nodo[1].out[1] <--> Channel <--> nodo[3].in[0];
+        //nodo3
+        nodo[2].out$o[0] --> Canal --> Receptor[0].in;
+        //nodo4
+        nodo[3].out$o[0] --> Canal --> Receptor[1].in;
+        
+        //nodo5
+        Source[2].out --> Canal --> nodo[4].inPaquetes;
+        nodo[4].out[0] <--> Channel <--> nodo[3].in[1];
+        nodo[4].out[1] <--> Channel <--> nodo[1].in[2];
+        
+        Receptor[0].out --> Canal --> acumulador.in[0];
+        Receptor[1].out --> Canal --> acumulador.in[1];
 }
