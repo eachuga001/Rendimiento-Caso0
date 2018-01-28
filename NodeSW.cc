@@ -177,7 +177,7 @@ void NodeSW::sendPacket(cMessage* packet,int port)
     send(packet -> dup(), "out$o",port);
     cChannel* txChannel = gate("out$o",port)->getChannel();
     simtime_t timeout = par ("timeout");
-    simtime_t time = std::max(txChannel->getTransmissionFinishTime() + timeout, simTime());
+    simtime_t time = txChannel->getTransmissionFinishTime() + timeout;
     if (probabilities.size() == 1)
     {
         if (txQueues[port].isEmpty())
