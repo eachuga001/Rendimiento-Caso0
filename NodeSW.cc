@@ -164,10 +164,10 @@ void NodeSW::forwardMessage(cMessage *msg)
 int NodeSW::getOutPort(){
     int port = 0;
     double rand = uniform (0,1);
-    while (rand >= probabilities[port])
+    while (rand > probabilities[port])
     {
-        port++;
         rand = rand - probabilities[port];
+        port++;
     }
     return port;
 }

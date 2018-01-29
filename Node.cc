@@ -133,8 +133,8 @@ int Node::getOutPort(){
     double rand = uniform (0,1);
     while (rand >= probabilities[port])
     {
-        port++;
         rand = rand - probabilities[port];
+        port++;
     }
     return port;
 }
